@@ -1,0 +1,41 @@
+.container {
+    padding: 16px;
+    background-color: #f0f4f8;
+  }
+  
+  .paper {
+    padding: 16px;
+    background-color: #fff;
+    transition: transform 0.3s ease;
+  }
+  
+  .paper:hover {
+    transform: translateY(-5px);
+  }
+  
+  .title {
+    color: #1976d2;
+  }
+  
+  .subtitle {
+    color: #333;
+  }
+  
+  .buttonContainer {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  
+  .button {
+    margin-right: 16px;
+  }
+  
+  .listItem {
+    transition: transform 0.3s ease;
+  }
+  
+  .listItem:hover {
+    transform: translateX(10px);
+  }
+  
