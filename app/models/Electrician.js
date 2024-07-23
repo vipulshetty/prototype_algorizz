@@ -1,9 +1,13 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
-const ElectricianSchema = new mongoose.Schema({
+const electricianSchema = new mongoose.Schema({
   name: String,
-  assignedIssues: Number,
-  solvedComplaints: Number,
+  assignedIssues: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Issue',
+    }
+  ]
 });
 
-export default mongoose.models.Electrician || mongoose.model('Electrician', ElectricianSchema);
+module.exports = mongoose.models.Electrician || mongoose.model('Electrician', electricianSchema);

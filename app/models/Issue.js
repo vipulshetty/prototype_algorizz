@@ -1,13 +1,20 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
-const IssueSchema = new mongoose.Schema({
+const issueSchema = new mongoose.Schema({
   category: String,
-  description: String,
+  text: String,
   customerName: String,
   address: String,
-  status: String,
-  solution: String,
-  electrician: String,
+  electricianAssigned: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Electrician',
+    default: null,
+  },
+  status: {
+    type: String,
+    enum: ['open', 'closed'],
+    default: 'open',
+  }
 });
 
-export default mongoose.models.Issue || mongoose.model('Issue', IssueSchema);
+module.exports = mongoose.models.Issue || mongoose.model('Issue', issueSchema);
