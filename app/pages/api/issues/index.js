@@ -1,30 +1,30 @@
-import dbConnect from '../../../lib/dbConnect';
-import Issue from '../../../models/Issue';
+import { issues, electricians } from '../../../data';
 
-export default async function handler(req, res) {
-  const { method } = req;
+export default function handler(req, res) {
+  if (req.method === 'POST') {
+    const { category, description, customerName, customerAddress } = req.body;
+    const newIssue = {
+      id: issues.length + 1,
+      category,
+      description,
+      customerName,
+      customerAddress,
+      status: 'open',
+    };
 
-  await dbConnect();
+    issues.push(newIssue);
 
-  switch (method) {
-    case 'GET':
-      try {
-        const issues = await Issue.find({});
-        res.status(200).json({ success: true, data: issues });
-      } catch (error) {
-        res.status(400).json({ success: false });
-      }
-      break;
-    case 'POST':
-      try {
-        const issue = await Issue.create(req.body);
-        res.status(201).json({ success: true, data: issue });
-      } catch (error) {
-        res.status(400).json({ success: false });
-      }
-      break;
-    default:
-      res.status(400).json({ success: false });
-      break;
+    // Round-robin assignment
+    const availableElectrician = electricians.find(e => e.status === 'available');
+    if (availableElectrician) {
+      availableElectrician.status = 'busy';
+      newIssue.assignedTo = availableElectrician.id;
+    }
+
+    res.status(201).json(newIssue);
+  } else if (req.method === 'GET') {
+    res.status(200).json(issues);
+  } else {
+    res.status(405).json({ message: 'Method not allowed' });
   }
 }

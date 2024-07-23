@@ -1,31 +1,44 @@
-import dbConnect from '../../../lib/dbConnect';
-import Issue from '../../../models/Issue';
+// /pages/api/issues/[id].js
+import { issues, electricians } from '../../../data'; // Adjust the path to your data file
 
-export default async function handler(req, res) {
-  const { method } = req;
+export default function handler(req, res) {
   const { id } = req.query;
+  const issueIndex = issues.findIndex((issue) => issue.id === parseInt(id));
 
-  await dbConnect();
+  if (issueIndex === -1) {
+    res.status(404).json({ message: 'Issue not found' });
+    return;
+  }
 
-  switch (method) {
-    case 'PATCH':
-      try {
-        const issue = await Issue.findByIdAndUpdate(id, req.body, { new: true });
-        res.status(200).json({ success: true, data: issue });
-      } catch (error) {
-        res.status(400).json({ success: false });
+  if (req.method === 'GET') {
+    res.status(200).json(issues[issueIndex]);
+  } else if (req.method === 'PUT') {
+    const { category, description, customerName, customerAddress, status } = req.body;
+
+    issues[issueIndex] = {
+      ...issues[issueIndex],
+      category,
+      description,
+      customerName,
+      customerAddress,
+      status,
+    };
+
+    if (status === 'closed') {
+      const assignedElectrician = electricians.find(
+        (e) => e.id === issues[issueIndex].assignedTo
+      );
+      if (assignedElectrician) {
+        assignedElectrician.status = 'available';
+        assignedElectrician.solvedIssues += 1;
       }
-      break;
-    case 'DELETE':
-      try {
-        const deletedIssue = await Issue.deleteOne({ _id: id });
-        res.status(200).json({ success: true, data: deletedIssue });
-      } catch (error) {
-        res.status(400).json({ success: false });
-      }
-      break;
-    default:
-      res.status(400).json({ success: false });
-      break;
+    }
+
+    res.status(200).json(issues[issueIndex]);
+  } else if (req.method === 'DELETE') {
+    issues.splice(issueIndex, 1);
+    res.status(204).end();
+  } else {
+    res.status(405).json({ message: 'Method not allowed' });
   }
 }
