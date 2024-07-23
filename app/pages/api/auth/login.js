@@ -1,16 +1,20 @@
-import jwt from 'jsonwebtoken';
+import { generateToken } from '../../../lib/auth';
+import cors, { runMiddleware } from '../../../lib/middleware';
 
-export default function handler(req, res) {
-  if (req.method === 'POST') {
-    const { username, password } = req.body;
+const users = {
+  admin: 'password', // Example: In production, use hashed passwords and a database
+};
 
-    if (username === 'admin' && password === 'password') {
-      const token = jwt.sign({ username }, process.env.JWT_SECRET, { expiresIn: '1h' });
-      res.status(200).json({ token });
-    } else {
-      res.status(401).json({ message: 'Invalid credentials' });
-    }
+export default async function handler(req, res) {
+  // Run the CORS middleware
+  await runMiddleware(req, res, cors);
+
+  const { username, password } = req.body;
+
+  if (users[username] && users[username] === password) {
+    const token = generateToken({ username });
+    res.json({ token });
   } else {
-    res.status(405).json({ message: 'Method not allowed' });
+    res.status(401).json({ message: 'Invalid credentials' });
   }
 }

@@ -1,10 +1,14 @@
 import dbConnect from '../../../lib/db';
 import Issue from '../../../models/Issue';
 import { authenticateToken } from '../../../lib/auth';
+import cors, { runMiddleware } from '../../../lib/middleware';
 
 export default async function handler(req, res) {
+  // Run the CORS middleware
+  await runMiddleware(req, res, cors);
+
   await dbConnect();
-  
+
   authenticateToken(req, res, async () => {
     if (req.method === 'GET') {
       const issues = await Issue.find({});
@@ -15,7 +19,7 @@ export default async function handler(req, res) {
         category,
         text,
         customerName,
-        address
+        address,
       });
       await newIssue.save();
       res.status(201).json(newIssue);
