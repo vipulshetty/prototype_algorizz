@@ -1,41 +1,45 @@
-"use client";
-import { createContext, useContext, useState } from 'react';
+// contexts/DashboardContext.js
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const DashboardContext = createContext();
+
+export const useDashboard = () => useContext(DashboardContext);
 
 export const DashboardProvider = ({ children }) => {
   const [electricians, setElectricians] = useState([]);
   const [issues, setIssues] = useState([]);
 
-  const addElectrician = (electrician) => {
-    setElectricians((prev) => [...prev, electrician]);
-  };
+  useEffect(() => {
+    // Fetch electricians and issues from your API
+    const fetchData = async () => {
+      try {
+        const [electricianRes, issueRes] = await Promise.all([
+          fetch('/api/electricians'),
+          fetch('/api/issues'),
+        ]);
 
-  const addIssue = (issue) => {
-    const assignedIssue = assignIssue(issue);
-    setIssues((prev) => [...prev, assignedIssue]);
-  };
-
-  const assignIssue = (issue) => {
-    setElectricians((prevElectricians) => {
-      const availableElectrician = prevElectricians.find(e => e.status === 'Available');
-      if (availableElectrician) {
-        issue.electrician = availableElectrician.name;
-        availableElectrician.assignedIssues += 1;
-        if (availableElectrician.assignedIssues >= 5) {
-          availableElectrician.status = 'Busy';
+        if (!electricianRes.ok || !issueRes.ok) {
+          throw new Error('Failed to fetch data');
         }
+
+        const [electricianData, issueData] = await Promise.all([
+          electricianRes.json(),
+          issueRes.json(),
+        ]);
+
+        setElectricians(electricianData);
+        setIssues(issueData);
+      } catch (error) {
+        console.error('Error fetching data:', error);
       }
-      return [...prevElectricians];
-    });
-    return issue;
-  };
+    };
+
+    fetchData();
+  }, []);
 
   return (
-    <DashboardContext.Provider value={{ electricians, issues, addElectrician, addIssue }}>
+    <DashboardContext.Provider value={{ electricians, issues }}>
       {children}
     </DashboardContext.Provider>
   );
 };
-
-export const useDashboard = () => useContext(DashboardContext);

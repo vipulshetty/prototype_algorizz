@@ -1,20 +1,44 @@
-"use client";
-import { List, ListItem, ListItemText, Button } from '@mui/material';
+// components/ElectricianList.js
+import { useEffect, useState } from 'react';
+import { List, ListItem, ListItemText, CircularProgress, Alert } from '@mui/material';
 
-const ElectricianList = ({ electricians, deleteElectrician }) => (
-  <List>
-    {electricians.map((electrician, index) => (
-      <ListItem key={index}>
-        <ListItemText
-          primary={electrician.name}
-          secondary={`Solved Complaints: ${electrician.solvedComplaints || 0}, Assigned Issues: ${electrician.assignedIssues || 0}`}
-        />
-        <Button onClick={() => deleteElectrician(index)} color="secondary">
-          Delete
-        </Button>
-      </ListItem>
-    ))}
-  </List>
-);
+const ElectricianList = () => {
+  const [electricians, setElectricians] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchElectricians = async () => {
+      try {
+        const response = await fetch('/api/electricians');
+        if (!response.ok) throw new Error('Failed to fetch data');
+        const data = await response.json();
+        setElectricians(data);
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchElectricians();
+  }, []);
+
+  if (loading) return <CircularProgress />;
+  if (error) return <Alert severity="error">{error}</Alert>;
+
+  return (
+    <List>
+      {electricians.map((electrician) => (
+        <ListItem key={electrician._id}>
+          <ListItemText
+            primary={`Name: ${electrician.name}`}
+            secondary={`Expertise: ${electrician.expertise}, Contact: ${electrician.contact}`}
+          />
+        </ListItem>
+      ))}
+    </List>
+  );
+};
 
 export default ElectricianList;

@@ -1,4 +1,5 @@
 "use client";
+import React from 'react';
 import { Paper, Typography } from '@mui/material';
 import ElectricianForm from '../Components/ElectricianForm';
 
