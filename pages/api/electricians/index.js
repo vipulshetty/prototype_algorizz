@@ -1,6 +1,6 @@
 // pages/api/electricians/index.js
 import dbConnect from '../../../app/lib/db';
-import Electrician from '../../../app/models/electricians';
+// import Electrician from '../../../app/models/electricians';
 import { authenticateToken } from '../../../app/lib/auth';
 
 export default async function handler(req, res) {
