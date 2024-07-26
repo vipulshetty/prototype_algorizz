@@ -1,7 +1,7 @@
 // pages/api/issues.js
 import { MongoClient } from 'mongodb';
 
-const MONGO_URI = 'mongodb://localhost:27017/algorizz';
+const MONGO_URI = process.env.MONGO_URI;
 const client = new MongoClient(MONGO_URI);
 
 export default async function handler(req, res) {
@@ -11,13 +11,13 @@ export default async function handler(req, res) {
     const collection = db.collection('issues');
 
     if (req.method === 'POST') {
-      // Handle POST request
       const { description, name, address, electrician } = req.body;
+      console.log('Incoming POST request:', { description, name, address, electrician });
+
       const newIssue = { description, name, address, electrician };
       await collection.insertOne(newIssue);
       res.status(200).json({ message: 'Issue added successfully!' });
     } else if (req.method === 'GET') {
-      // Handle GET request
       const issues = await collection.find({}).toArray();
       res.status(200).json(issues);
     } else {
@@ -25,6 +25,7 @@ export default async function handler(req, res) {
       res.status(405).end(`Method ${req.method} Not Allowed`);
     }
   } catch (error) {
+    console.error('Error handling request:', error);
     res.status(500).json({ message: 'Failed to handle request', error });
   } finally {
     await client.close();
