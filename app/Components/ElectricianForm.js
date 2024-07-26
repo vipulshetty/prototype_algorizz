@@ -10,15 +10,19 @@ const ElectricianForm = () => {
   const [success, setSuccess] = useState(false);
   const router = useRouter();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    addElectrician({ name, status: 'Available', assignedIssues: 0, solvedComplaints: 0 });
-    setName('');
-    setSuccess(true);
-    setTimeout(() => {
-      setSuccess(false);
-      router.push('/dashboard');
-    }, 2000);
+    try {
+      await addElectrician({ name, status: 'Available', assignedIssues: 0, solvedComplaints: 0 });
+      setName('');
+      setSuccess(true);
+      setTimeout(() => {
+        setSuccess(false);
+        router.push('/dashboard');
+      }, 2000);
+    } catch (error) {
+      console.error('Failed to add electrician', error);
+    }
   };
 
   return (

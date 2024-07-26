@@ -1,11 +1,13 @@
-import '../globals.css';
-import RootLayout from './layout';
+"use client"
+// app/_app.js
+
+import '../styles/globals.css';
 
 function MyApp({ Component, pageProps }) {
   return (
-    <RootLayout>
+    <AuthProvider>
       <Component {...pageProps} />
-    </RootLayout>
+    </AuthProvider>
   );
 }
 

@@ -1,20 +1,46 @@
-"use client";
-import { List, ListItem, ListItemText, Button } from '@mui/material';
+// components/IssueList.js
+import { useEffect, useState } from 'react';
+import { CircularProgress, List, ListItem, ListItemText } from '@mui/material';
 
-const IssueList = ({ issues, deleteIssue }) => (
-  <List>
-    {issues.map((issue, index) => (
-      <ListItem key={index}>
-        <ListItemText
-          primary={issue.description}
-          secondary={`Customer: ${issue.customerName}, Address: ${issue.customerAddress}, Status: ${issue.status}`}
-        />
-        <Button onClick={() => deleteIssue(index)} color="secondary">
-          Delete
-        </Button>
-      </ListItem>
-    ))}
-  </List>
-);
+const IssueList = () => {
+  const [issues, setIssues] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchIssues = async () => {
+      try {
+        const response = await fetch('/api/issues');
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        setIssues(data);
+      } catch (error) {
+        setError(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchIssues();
+  }, []);
+
+  if (loading) return <CircularProgress />;
+  if (error) return <p>Error loading issues: {error.message}</p>;
+
+  return (
+    <List>
+      {issues.map((issue) => (
+        <ListItem key={issue._id}>
+          <ListItemText
+            primary={`Name: ${issue.name}`}
+            secondary={`Description: ${issue.description}, Address: ${issue.address}`}
+          />
+        </ListItem>
+      ))}
+    </List>
+  );
+};
 
 export default IssueList;

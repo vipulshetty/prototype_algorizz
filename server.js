@@ -21,3 +21,8 @@ app.prepare().then(() => {
     console.log('> Ready on http://localhost:3000');
   });
 });
+
+app.get('/messages', (req, res) => {
+  res.json(messages);
+});
+

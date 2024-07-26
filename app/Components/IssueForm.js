@@ -1,46 +1,48 @@
 "use client";
 import { useState } from 'react';
-import { Button, TextField, MenuItem, Snackbar, Alert } from '@mui/material';
+import { Button, TextField, Snackbar, Alert } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useDashboard } from '../contexts/DashboardContext';
 
 const IssueForm = () => {
   const { addIssue } = useDashboard();
-  const [category, setCategory] = useState('');
   const [description, setDescription] = useState('');
   const [name, setName] = useState('');
   const [address, setAddress] = useState('');
   const [success, setSuccess] = useState(false);
   const router = useRouter();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    addIssue({ category, description, name, address, electrician: null });
-    setCategory('');
-    setDescription('');
-    setName('');
-    setAddress('');
-    setSuccess(true);
-    setTimeout(() => {
-      setSuccess(false);
-      router.push('/dashboard');
-    }, 2000);
+    try {
+      const response = await fetch('/api/issues', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ description, name, address, electrician: null }),
+      });
+  
+      if (response.ok) {
+        setDescription('');
+        setName('');
+        setAddress('');
+        setSuccess(true);
+        setTimeout(() => {
+          setSuccess(false);
+          router.push('/dashboard');
+        }, 2000);
+      } else {
+        throw new Error('Failed to add issue');
+      }
+    } catch (error) {
+      console.error('Failed to add issue', error);
+    }
   };
+  
 
   return (
     <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-      <TextField
-        label="Category"
-        value={category}
-        onChange={(e) => setCategory(e.target.value)}
-        select
-        required
-      >
-        <MenuItem value="Electrical">Electrical</MenuItem>
-        <MenuItem value="Plumbing">Plumbing</MenuItem>
-        <MenuItem value="HVAC">HVAC</MenuItem>
-        <MenuItem value="General">General</MenuItem>
-      </TextField>
       <TextField
         label="Description"
         value={description}

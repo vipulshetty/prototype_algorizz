@@ -1,7 +1,8 @@
 {
   "name": "prototype_algorizz",
   "version": "0.1.0",
-  "private": true,
+  "main": "index.js",
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -9,15 +10,21 @@
     "start": "node server.js"
   },
   "dependencies": {
-    "@emotion/react": "^11.12.0",
-    "@emotion/styled": "^11.12.0",
-    "@mui/material": "^5.16.4",
+    "@emotion/react": "^11.13.0",
+    "@emotion/styled": "^11.13.0",
+    "@mui/material": "^5.16.5",
+    "axios": "^1.7.2",
+    "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.8.0",
+    "mongoose": "^8.5.1",
     "next": "14.2.5",
     "react": "^18",
     "react-dom": "^18"
   },
   "devDependencies": {
+    "@babel/plugin-transform-runtime": "^7.13.15",
     "eslint": "^8",
     "eslint-config-next": "14.2.5",
     "postcss": "^8",
