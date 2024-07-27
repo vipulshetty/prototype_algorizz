@@ -1,12 +1,40 @@
 "use client";
+
+import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useDashboard } from '../contexts/DashboardContext';
-import { Grid, Paper, Button, Typography, List, ListItem, ListItemText } from '@mui/material';
+import { Button, Grid, List, ListItem, ListItemText, Paper, Typography } from '@mui/material';
 import styles from './Dashboard.module.css';
 
 const Dashboard = () => {
   const router = useRouter();
-  const { electricians, issues } = useDashboard();
+  const { electricians, setElectricians, issues, setIssues } = useDashboard();
+
+  // Handle deleting an electrician
+  const handleDeleteElectrician = async (id) => {
+    try {
+      await fetch(`/api/electricians/${id}`, {
+        method: 'DELETE',
+      });
+      // Update state after successful deletion
+      setElectricians(electricians.filter(e => e._id !== id));
+    } catch (error) {
+      console.error('Error deleting electrician:', error);
+    }
+  };
+
+  // Handle deleting an issue
+  const handleDeleteIssue = async (id) => {
+    try {
+      await fetch(`/api/issues/${id}`, {
+        method: 'DELETE',
+      });
+      // Update state after successful deletion
+      setIssues(issues.filter(i => i._id !== id));
+    } catch (error) {
+      console.error('Error deleting issue:', error);
+    }
+  };
 
   return (
     <Grid container spacing={3} className={styles.container}>
@@ -37,9 +65,19 @@ const Dashboard = () => {
         <Paper elevation={3} className={styles.paper}>
           <Typography variant="h6" className={styles.subtitle}>Electricians</Typography>
           <List>
-            {electricians.map((electrician, index) => (
-              <ListItem key={index} className={styles.listItem}>
-                <ListItemText primary={electrician.name} secondary={`Status: ${electrician.status}, Assigned Issues: ${electrician.assignedIssues}, Solved Complaints: ${electrician.solvedComplaints}`} />
+            {electricians.map((electrician) => (
+              <ListItem key={electrician._id} className={styles.listItem}>
+                <ListItemText
+                  primary={electrician.name}
+                  secondary={`Status: ${electrician.status}, Assigned Issues: ${electrician.assignedIssues}, Solved Complaints: ${electrician.solvedComplaints}`}
+                />
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  onClick={() => handleDeleteElectrician(electrician._id)}
+                >
+                  Delete
+                </Button>
               </ListItem>
             ))}
           </List>
@@ -49,9 +87,19 @@ const Dashboard = () => {
         <Paper elevation={3} className={styles.paper}>
           <Typography variant="h6" className={styles.subtitle}>Issues</Typography>
           <List>
-            {issues.map((issue, index) => (
-              <ListItem key={index} className={styles.listItem}>
-                <ListItemText primary={`${issue.category}: ${issue.description}`} secondary={`Customer: ${issue.name}, Address: ${issue.address}, Assigned Electrician: ${issue.electrician || 'Unassigned'}`} />
+            {issues.map((issue) => (
+              <ListItem key={issue._id} className={styles.listItem}>
+                <ListItemText
+                  primary={`${issue.category}: ${issue.description}`}
+                  secondary={`Customer: ${issue.name}, Address: ${issue.address}, Assigned Electrician: ${issue.electrician || 'Unassigned'}`}
+                />
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  onClick={() => handleDeleteIssue(issue._id)}
+                >
+                  Delete
+                </Button>
               </ListItem>
             ))}
           </List>

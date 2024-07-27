@@ -1,42 +1,31 @@
 // components/IssueList.js
-import { useEffect, useState } from 'react';
-import { CircularProgress, List, ListItem, ListItemText } from '@mui/material';
 
-const IssueList = () => {
-  const [issues, setIssues] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+import React from 'react';
+import { Button, List, ListItem, ListItemText } from '@mui/material';
 
-  useEffect(() => {
-    const fetchIssues = async () => {
-      try {
-        const response = await fetch('/api/issues');
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
-        setIssues(data);
-      } catch (error) {
-        setError(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchIssues();
-  }, []);
-
-  if (loading) return <CircularProgress />;
-  if (error) return <p>Error loading issues: {error.message}</p>;
+const IssueList = ({ issues, onDelete }) => {
+  const handleDelete = async (id) => {
+    try {
+      await fetch(`/api/issues/${id}`, {
+        method: 'DELETE',
+      });
+      onDelete(id); // Update parent component's state
+    } catch (error) {
+      console.error('Failed to delete issue:', error);
+    }
+  };
 
   return (
     <List>
       {issues.map((issue) => (
         <ListItem key={issue._id}>
           <ListItemText
-            primary={`Name: ${issue.name}`}
-            secondary={`Description: ${issue.description}, Address: ${issue.address}`}
+            primary={`${issue.category}: ${issue.description}`}
+            secondary={`Customer: ${issue.name}, Address: ${issue.address}, Assigned Electrician: ${issue.electrician || 'Unassigned'}`}
           />
+          <Button onClick={() => handleDelete(issue._id)} variant="contained" color="error">
+            Delete
+          </Button>
         </ListItem>
       ))}
     </List>

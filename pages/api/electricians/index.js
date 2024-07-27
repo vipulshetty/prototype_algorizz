@@ -1,7 +1,7 @@
 // pages/api/electricians.js
 import { MongoClient } from 'mongodb';
 
-const MONGO_URI = 'mongodb://localhost:27017/algorizz';
+const MONGO_URI = process.env.MONGO_URI;
 const client = new MongoClient(MONGO_URI);
 
 export default async function handler(req, res) {
