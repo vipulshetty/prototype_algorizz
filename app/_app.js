@@ -1,12 +1,13 @@
 "use client";
-import '../globals.css';
-import RootLayout from './layout';
+
+import '../styles/globals.css';
+import { DashboardProvider } from '../contexts/DashboardContext';
 
 function MyApp({ Component, pageProps }) {
   return (
-    <RootLayout>
+    <DashboardProvider>
       <Component {...pageProps} />
-    </RootLayout>
+    </DashboardProvider>
   );
 }
 

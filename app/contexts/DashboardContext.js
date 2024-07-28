@@ -1,4 +1,3 @@
-// contexts/DashboardContext.js
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const DashboardContext = createContext();
@@ -38,7 +37,7 @@ export const DashboardProvider = ({ children }) => {
   }, []);
 
   return (
-    <DashboardContext.Provider value={{ electricians, issues }}>
+    <DashboardContext.Provider value={{ electricians, setElectricians, issues, setIssues }}>
       {children}
     </DashboardContext.Provider>
   );

@@ -1,37 +1,32 @@
-// pages/api/electricians.js
-import { MongoClient } from 'mongodb';
-
-const MONGO_URI = process.env.MONGO_URI;
-const client = new MongoClient(MONGO_URI);
+import clientPromise from '../../../utils/mongodb';
 
 export default async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*'); // Allow all origins
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE'); // Allow specific methods
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type'); // Allow specific headers
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
   try {
-    await client.connect();
+    const client = await clientPromise;
     const db = client.db();
     const collection = db.collection('electricians');
 
     if (req.method === 'POST') {
       const { name, expertise, contact, email } = req.body;
 
-      // Detailed request validation
-      if (!name || !expertise || !contact) {
-        console.error('Missing required fields:', { name, expertise, contact });
+      if (!name || !expertise || !contact || !email) {
         return res.status(400).json({ message: 'Missing required fields' });
       }
 
-      // Ensure email is either not provided or correctly provided if indexed
-      if (email === undefined) {
-        console.error('Email field is required but not provided');
-        return res.status(400).json({ message: 'Email field is required' });
-      }
-
-      const newElectrician = { name, expertise, contact, email };
+      const newElectrician = { name, expertise, contact, email, status: 'available', assignedIssues: 0, solvedComplaints: 0 };
       const result = await collection.insertOne(newElectrician);
 
       if (result.acknowledged) {
-        res.status(200).json({ message: 'Electrician added successfully!' });
+        res.status(201).json({ message: 'Electrician added successfully!' });
       } else {
-        console.error('Failed to add electrician:', result);
         throw new Error('Failed to add electrician');
       }
     } else if (req.method === 'GET') {
@@ -44,7 +39,5 @@ export default async function handler(req, res) {
   } catch (error) {
     console.error('Error handling request:', error);
     res.status(500).json({ message: 'Failed to handle request', error: error.message });
-  } finally {
-    await client.close();
   }
 }

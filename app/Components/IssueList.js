@@ -1,35 +1,50 @@
-// components/IssueList.js
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { CircularProgress, Alert } from '@mui/material';
 
-import React from 'react';
-import { Button, List, ListItem, ListItemText } from '@mui/material';
+const IssuesList = () => {
+  const [issues, setIssues] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-const IssueList = ({ issues, onDelete }) => {
-  const handleDelete = async (id) => {
-    try {
-      await fetch(`/api/issues/${id}`, {
-        method: 'DELETE',
-      });
-      onDelete(id); // Update parent component's state
-    } catch (error) {
-      console.error('Failed to delete issue:', error);
-    }
-  };
+  useEffect(() => {
+    const fetchIssues = async () => {
+      try {
+        const response = await axios.get('/api/issues');
+        setIssues(response.data);
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchIssues();
+    
+    // Poll for updates every 30 seconds
+    const intervalId = setInterval(fetchIssues, 30000);
+
+    // Clean up interval on component unmount
+    return () => clearInterval(intervalId);
+  }, []);
+
+  if (loading) return <CircularProgress />;
+  if (error) return <Alert severity="error">{error}</Alert>;
 
   return (
-    <List>
-      {issues.map((issue) => (
-        <ListItem key={issue._id}>
-          <ListItemText
-            primary={`${issue.category}: ${issue.description}`}
-            secondary={`Customer: ${issue.name}, Address: ${issue.address}, Assigned Electrician: ${issue.electrician || 'Unassigned'}`}
-          />
-          <Button onClick={() => handleDelete(issue._id)} variant="contained" color="error">
-            Delete
-          </Button>
-        </ListItem>
+    <div>
+      <h1>Issues</h1>
+      {issues.map(issue => (
+        <div key={issue._id}>
+          <h2>{issue.description}</h2>
+          <p>Customer: {issue.name}</p>
+          <p>Address: {issue.address}</p>
+          <p>Assigned to: {issue.assignedElectricianName || 'Unassigned'}</p>
+          <p>Status: {issue.status}</p>
+        </div>
       ))}
-    </List>
+    </div>
   );
 };
 
-export default IssueList;
+export default IssuesList;

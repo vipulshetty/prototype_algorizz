@@ -1,4 +1,4 @@
-import { assignOpenIssues } from '../../../app/utils/roundRobinAssignment';
+import { assignOpenIssues } from '../../../utils/roundRobinAssignment';
 import dbConnect from '../../../app/lib/db.mjs';
 
 export default async function handler(req, res) {

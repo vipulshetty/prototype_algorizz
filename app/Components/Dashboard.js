@@ -26,9 +26,11 @@ const Dashboard = () => {
   // Handle deleting an issue
   const handleDeleteIssue = async (id) => {
     try {
-      await fetch(`/api/issues/${id}`, {
+      const response = await fetch(`/api/issues/${id}`, {
         method: 'DELETE',
       });
+      const data = await response.json();
+      alert(data.message);
       // Update state after successful deletion
       setIssues(issues.filter(i => i._id !== id));
     } catch (error) {
@@ -69,7 +71,7 @@ const Dashboard = () => {
               <ListItem key={electrician._id} className={styles.listItem}>
                 <ListItemText
                   primary={electrician.name}
-                  secondary={`Status: ${electrician.status}, Assigned Issues: ${electrician.assignedIssues}, Solved Complaints: ${electrician.solvedComplaints}`}
+                  secondary={`Status: ${electrician.status}, Assigned Issues: ${electrician.assignedIssues || 0}, Solved Complaints: ${electrician.solvedComplaints || 0}`}
                 />
                 <Button
                   variant="contained"
@@ -90,8 +92,8 @@ const Dashboard = () => {
             {issues.map((issue) => (
               <ListItem key={issue._id} className={styles.listItem}>
                 <ListItemText
-                  primary={`${issue.category}: ${issue.description}`}
-                  secondary={`Customer: ${issue.name}, Address: ${issue.address}, Assigned Electrician: ${issue.electrician || 'Unassigned'}`}
+                  primary={`${issue.description}`}
+                  secondary={`Customer: ${issue.name}, Address: ${issue.address}, Assigned Electrician: ${issue.assignedElectricianName || 'Unassigned'}, Status: ${issue.status}`}
                 />
                 <Button
                   variant="contained"
