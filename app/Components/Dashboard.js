@@ -38,6 +38,11 @@ const Dashboard = () => {
     }
   };
 
+  // Handle navigating to electrician details
+  const handleViewElectrician = (id) => {
+    router.push(`/electricians/${id}`);
+  };
+
   return (
     <Grid container spacing={3} className={styles.container}>
       <Grid item xs={12}>
@@ -72,6 +77,8 @@ const Dashboard = () => {
                 <ListItemText
                   primary={electrician.name}
                   secondary={`Status: ${electrician.status}, Assigned Issues: ${electrician.assignedIssues || 0}, Solved Complaints: ${electrician.solvedComplaints || 0}`}
+                  onClick={() => handleViewElectrician(electrician._id)} // Navigate on click
+                  style={{ cursor: 'pointer' }} // Pointer cursor to indicate clickable item
                 />
                 <Button
                   variant="contained"
